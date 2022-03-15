@@ -1,20 +1,15 @@
 from lib2to3.pgen2 import driver
-from bs4 import BeautifulSoup
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-import time
-
-# para rodar o chrome em 2º plano
-# from selenium.webdriver.chrome.options import Options
-# chrome_options = Options()
-# chrome_options.headless = True
-# navegador = webdriver.Chrome(options=chrome_options)
+from selenium.webdriver.chrome.options import Options
+import json
 
 
 def obtem_dados_clima(url):
-    navegador = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.headless = True
+    navegador = webdriver.Chrome(options=chrome_options)
     navegador.get(url)
 
     temperatura = navegador.find_element(
@@ -26,7 +21,7 @@ def obtem_dados_clima(url):
     umidade = navegador.find_element(
         by=By.XPATH, value='//ul[@class="variables-list"]/li[4]/div').text.split('\n')
     sol = navegador.find_element(
-        by=By.XPATH, value='//ul[@class="variables-list"]/li[5]/span[2]').text.replace(' ', '-')
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[5]/span[2]').text.replace(' ', ' - ')
 
     navegador.quit()
 
@@ -44,5 +39,7 @@ def obtem_dados_clima(url):
 
 url = 'https://www.climatempo.com.br/previsao-do-tempo/cidade/1000/varzeaalegre-ce'
 clima = obtem_dados_clima(url)
-for k, c in clima.items():
-    print(k + ' => ' + c)
+
+clima_json = json.dumps(clima, indent=4)
+with open('climaTempo/clima.json', 'w') as arquivo:
+    arquivo.write(clima_json)
