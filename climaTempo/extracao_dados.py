@@ -12,31 +12,37 @@ import time
 # chrome_options.headless = True
 # navegador = webdriver.Chrome(options=chrome_options)
 
-navegador = webdriver.Chrome()
+
+def obtem_dados_clima(url):
+    navegador = webdriver.Chrome()
+    navegador.get(url)
+
+    temperatura = navegador.find_element(
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[1]/div').text.split('\n')
+    chuva = navegador.find_element(
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[2]/div').text
+    vento = navegador.find_element(
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[3]/div').text
+    umidade = navegador.find_element(
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[4]/div').text.split('\n')
+    sol = navegador.find_element(
+        by=By.XPATH, value='//ul[@class="variables-list"]/li[5]/span[2]').text.replace(' ', '-')
+
+    navegador.quit()
+
+    dados_clima = {
+        'Temperatura minima': temperatura[0],
+        'Temperatura maxima': temperatura[1],
+        'Chuva': chuva,
+        'Vento': vento,
+        'Umidade min': umidade[0],
+        'Umidade max': umidade[1],
+        'Sol': sol
+    }
+    return dados_clima
+
+
 url = 'https://www.climatempo.com.br/previsao-do-tempo/cidade/1000/varzeaalegre-ce'
-navegador.get(url)
-
-# temp_min = navegador.find_element(
-#     by=By.XPATH, value='//*[@id="min-temp-1"]').text
-# temp_max = navegador.find_element(
-#     by=By.XPATH, value='//*[@id="max-temp-1"]').text
-temperatura = navegador.find_element(
-    by=By.XPATH, value='//ul[@class="variables-list"]/li[1]/div').text
-chuva = navegador.find_element(
-    by=By.XPATH, value='//ul[@class="variables-list"]/li[2]/div').text
-vento = navegador.find_element(
-    by=By.XPATH, value='//ul[@class="variables-list"]/li[3]/div').text
-umidade = navegador.find_element(
-    by=By.XPATH, value='//ul[@class="variables-list"]/li[4]/div').text
-sol = navegador.find_element(
-    by=By.XPATH, value='//ul[@class="variables-list"]/li[5]/span[2]').text
-
-# print(temp_min, temp_max, chuva, vento)
-
-print(temperatura)
-print(chuva)
-print(vento)
-print(umidade)
-print(sol)
-
-navegador.quit()
+clima = obtem_dados_clima(url)
+for k, c in clima.items():
+    print(k + ' => ' + c)
